@@ -15,8 +15,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install requests pandas
-      - run: python sleeper_export.py
+      - run: pip install requests pandas 
+      - run: |
+          python sleeper_export.py
+          mkdir -p data
+          mv sleeper_export.json data/data.json
       - name: Commit if changed
         run: |
           git config user.name "dashboard-bot"
