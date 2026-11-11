@@ -1,0 +1,25 @@
+name: Refresh dashboard data
+on:
+  schedule:
+    - cron: "0 9 * * *"   # 9:00 UTC, about 4 am Toronto
+  workflow_dispatch: {}    # lets you run it manually too
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests pandas
+      - run: python sleeper_export.py
+      - name: Commit if changed
+        run: |
+          git config user.name "dashboard-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || (git commit -m "Daily data refresh" && git push)
